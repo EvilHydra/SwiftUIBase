@@ -7,27 +7,25 @@
 
 import SwiftUI
 
-struct ViewPositionKey: PreferenceKey {
-    typealias Value = ViewCoordinate
+public struct ViewPositionKey: PreferenceKey {
+    public typealias Value = ViewCoordinate
     
-    static var defaultValue: ViewCoordinate = ViewCoordinate(id: "", name: "")
+    public static var defaultValue: ViewCoordinate = ViewCoordinate(id: "", name: "")
     
-    static func reduce(value: inout ViewCoordinate, nextValue: () -> ViewCoordinate) {
+    public static func reduce(value: inout ViewCoordinate, nextValue: () -> ViewCoordinate) {
         value = nextValue()
     
     }
 }
 
 
-struct VisibleModifier: ViewModifier {
+public struct VisibleModifier: ViewModifier {
     
-    @Binding private(set) var isVisible: Bool?
+    @Binding public private(set) var isVisible: Bool?
     
-    var coordinate: ViewCoordinate?
+    public var coordinate: ViewCoordinate?
     
-    @State var selfCoordinate: ViewCoordinate?
-    
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
 
         content
             .background(GeometryReader(content: { geometry in
@@ -57,7 +55,7 @@ struct VisibleModifier: ViewModifier {
     }
 }
 
-extension View {
+public extension View {
     func isVisible(_ binding: Binding<Bool?> = .constant(nil), coordinate: ViewCoordinate?) -> some View {
         let view = modifier(VisibleModifier(isVisible: binding, coordinate: coordinate))
         return view
@@ -65,29 +63,29 @@ extension View {
 }
 
 
-struct ViewCoordinate: Equatable {
-    static func == (lhs: ViewCoordinate, rhs: ViewCoordinate) -> Bool {
+public struct ViewCoordinate: Equatable {
+    public static func == (lhs: ViewCoordinate, rhs: ViewCoordinate) -> Bool {
         lhs.id == rhs.id
     }
     
-    let id: String
-    var proxy: GeometryProxy?
-    var name: AnyHashable?
+    public let id: String
+    public private(set) var proxy: GeometryProxy?
+    public private(set) var name: AnyHashable?
     
     // because of recursive, so use array to break it.
     private let referCoordinates: [ViewCoordinate]?
     
     // MARK: - Getter
-    var referCoordinate: ViewCoordinate? { referCoordinates?.first }
+    public var referCoordinate: ViewCoordinate? { referCoordinates?.first }
     
-    var space: CoordinateSpace {
+    public var space: CoordinateSpace {
         guard let name = name else {
             return .global
         }
         return .named(name)
     }
     
-    init(id: String, proxy: GeometryProxy? = nil, name: AnyHashable? = nil, referCoordinate: ViewCoordinate? = nil) {
+    public init(id: String, proxy: GeometryProxy? = nil, name: AnyHashable? = nil, referCoordinate: ViewCoordinate? = nil) {
         self.id = id
         self.name = name
         self.proxy = proxy
@@ -100,7 +98,7 @@ struct ViewCoordinate: Equatable {
     }
     
     
-    func isVisibleOnSuperView() -> Bool {
+    public func isVisibleOnSuperView() -> Bool {
         guard let name = referCoordinate?.name else { return false }
         let space = CoordinateSpace.named(name)
         print("space: \(space)")
@@ -110,7 +108,7 @@ struct ViewCoordinate: Equatable {
     
 }
 
-extension GeometryProxy {
+public extension GeometryProxy {
 
     func isVisible(on space: CoordinateSpace? = nil, frame: CGRect? = nil) -> Bool {
         
